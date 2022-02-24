@@ -2,6 +2,11 @@ import express from 'express';
 import IController from './controllers/Brands/brands.controller';
 import cors from 'cors';
 
+/**
+ * Class that handles everything related to the server
+ * @class App
+ * @classdesc The App class handles everything related to the server
+ */
 class App {
     public app: express.Application;
     private readonly port: number;
@@ -10,13 +15,13 @@ class App {
         this.app = express();
         this.port = port;
 
-        this.initializeControllers(controllers);
-        this.app.use(express.json());
-
         this.app.all('*', (req: express.Request, res: express.Response, next: express.NextFunction) => {
             res.header("Access-Control-Allow-Origin", "http://localhost:8080");
             next();
         });
+
+        this.initializeControllers(controllers);
+        this.app.use(express.json());
 
         const allowedOrigins = ['http://localhost:8080'];
         this.app.use(cors({
@@ -25,6 +30,11 @@ class App {
         }));
     }
 
+    /*
+    * Initializes the controllers
+    * @param {IController[]} controllers - The controllers to initialize
+    * @returns {void}
+    */
     private initializeControllers(controllers: IController[]): void {
         for (const controller of controllers) {
             this.app.use(`/api`, controller.router);

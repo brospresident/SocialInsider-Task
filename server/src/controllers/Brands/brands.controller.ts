@@ -2,6 +2,13 @@ import express from 'express';
 import IController from '../controller';
 import axios, { AxiosRequestConfig } from 'axios';
 
+
+/**
+ * Class that handles the brands controller
+ * @class BrandsController
+ * @classdesc The BrandsController class handles the requests made using get_brands method
+ * @implements IController
+ */
 class Brands implements IController {
     public router: express.Router;
     public path: string;
@@ -17,7 +24,6 @@ class Brands implements IController {
     }
 
     public async getData(req: express.Request, res: express.Response) {
-        res.header("Access-Control-Allow-Origin", "http://localhost:8080");
         const data = {
             jsonrpc: '2.0',
             method: 'socialinsider_api.get_brands',

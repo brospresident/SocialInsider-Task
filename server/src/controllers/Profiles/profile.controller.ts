@@ -2,6 +2,12 @@ import express from "express";
 import IController from "../controller";
 import axios, { AxiosRequestConfig } from "axios";
 
+
+/**
+ * Class that handles the brands profiles controller
+ * @class ProfilesController
+ * @classdesc The ProfilesController class handles the requests made using get_profile_data method
+ */
 class Profiles implements IController {
     public router: express.Router;
     public path: string;
@@ -16,7 +22,6 @@ class Profiles implements IController {
     }
 
     public async getData(req: express.Request, res: express.Response) {
-        res.header("Access-Control-Allow-Origin", "http://localhost:8080");
         const id = req.query?.id as string;
         let start: number = 0, end: number = 0;
 
