@@ -3,36 +3,26 @@
     <v-main>
       <h1 class = 'text-center'>Brand comparator</h1>
       <br>
-      <v-data-table
-        :headers="headers"
-        :items="brands"
-        :items-per-page="5"
-      ></v-data-table>
-      <v-row justify='start'>
-        <v-date-picker :show-current="false" v-model="picker1"></v-date-picker>
-      </v-row>
-      <v-row justify='start'>
-        <v-date-picker :show-current="false" v-model="picker2"></v-date-picker>
+      <div class = "d-flex justify-center">
+        <v-data-table
+          :headers="headers"
+          :items="brands"
+          :items-per-page="5"
+          class = "elevation-1 width"
+        ></v-data-table>
+      </div>
+      <v-row justify='center'>
+        <v-date-picker :show-current="false" v-model="picker1" class = "margin elevation-1"></v-date-picker>
+        <v-date-picker :show-current="false" v-model="picker2" class = "margin elevation-1"></v-date-picker>
       </v-row>
     </v-main>
   </v-app>
 </template>
 
 <script lang="ts">
+/* eslint-disable */
 import Vue from 'vue'
 import axios, { AxiosRequestConfig } from 'axios'
-
-// interface IProfile {
-//     name: string;
-//     profileAdded: string;
-//     id: string;
-//     profileType: string;
-// }
-
-// interface IBrand {
-//     profiles: IProfile[];
-//     brandname: string;
-// }
 
 export default Vue.extend({
   name: 'App',
@@ -45,15 +35,18 @@ export default Vue.extend({
         sortable: false,
         value: 'name'
       },
-      { text: 'Total profiles', value: 'profiles' },
-      { text: 'Total fans', value: 'fans' },
-      { text: 'Total engagement', value: 'engagement' }
+      { text: 'Total profiles', value: 'profiles', width: '20%' },
+      { text: 'Total fans', value: 'fans', width: '20%' },
+      { text: 'Total engagement', value: 'engagement', width: '20%' }
     ],
     brands: [] as any,
     picker1: (new Date(Date.now() - (new Date()).getTimezoneOffset() * 60000)).toISOString().substr(0, 10),
     picker2: (new Date(Date.now() - (new Date()).getTimezoneOffset() * 60000)).toISOString().substr(0, 10)
   }),
   methods: {
+    formatNumber (num: number) {
+      return num.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,')
+    },
     async fetchBrands (): Promise<void> {
       this.brands = []
       const axiosConfig: AxiosRequestConfig = {
@@ -70,11 +63,8 @@ export default Vue.extend({
         let engagement = 0
 
         for (const profile of brand.profiles) {
-          console.log(profile, start, end)
+          // console.log(profile, start, end)
           const id = profile.id
-          if (!/^\d+$/.test(id)) {
-            continue
-          }
           const type = profile.profile_type
           // console.log(id, type, start, end)
 
@@ -87,13 +77,21 @@ export default Vue.extend({
           const data = response.data
           // console.log(data)
 
-          for (const item of Object.keys(data)) {
-            if (!data[item].fans) {
-              fans += 0
-            } else {
-              fans += data[item].fans
-            }
+          const keys = Object.keys(data)
+          const lastDay = data[keys[keys.length - 1]]
+          let dataFans = 0
 
+          // check if last day has a field of fans
+          if (lastDay.fans) {
+            dataFans = parseInt(lastDay.fans)
+          } else {
+            dataFans = 0
+          }
+          
+          fans += dataFans
+          console.log(brand, data[keys[keys.length - 1]])
+
+          for (const item of keys) {
             if (!data[item].engagement) {
               engagement += 0
             } else {
@@ -104,23 +102,27 @@ export default Vue.extend({
         const newBrand: any = {
           name: brand.brandname,
           profiles: brand.profiles.length,
-          fans,
-          engagement
+          fans: this.formatNumber(fans),
+          engagement: this.formatNumber(engagement)
         }
         this.brands.push(newBrand)
       }
     }
   },
-  async mounted () {
-    await this.fetchBrands()
-  },
   watch: {
-    picker1: function () {
-      this.fetchBrands()
-    },
-    picker2: function () {
-      this.fetchBrands()
+    picker2: async function () {
+      await this.fetchBrands()
     }
   }
 })
 </script>
+
+<style>
+.margin {
+  margin: 20px 10px 10px 20px;
+}
+
+.width {
+  width: 60%;
+}
+</style>

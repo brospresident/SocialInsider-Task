@@ -2,18 +2,6 @@ import express from 'express';
 import IController from '../controller';
 import axios, { AxiosRequestConfig } from 'axios';
 
-// interface IProfile {
-//     name: string;
-//     profile_added: string;
-//     id: string;
-//     profile_type: string;
-// }
-
-// interface IBrand {
-//     profiles: IProfile[];
-//     brandname: string;
-// }
-
 class Brands implements IController {
     public router: express.Router;
     public path: string;
